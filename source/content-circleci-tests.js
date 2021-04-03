@@ -1,3 +1,6 @@
+const extensionHost = typeof (chrome) === 'object' ? chrome : browser;
+const { runtime } = extensionHost;
+
 function createButton(label, onClick) {
   const el = document.createElement('button');
   el.onclick = onClick;
@@ -13,6 +16,14 @@ function createPalette(...controls) {
   el.style.marginRight = '0.25em';
   controls.forEach(c => el.appendChild(c))
   return el;
+}
+
+function reportFlake(testMetadata) {
+  runtime.sendMessage({ feature: 'testing', action: 'reportFlake', subject: testMetadata });
+}
+
+function reportBug(testMetadata) {
+  runtime.sendMessage({ feature: 'testing', action: 'reportBug', subject: testMetadata });
 }
 
 function qualifyBranch() {
@@ -37,13 +48,13 @@ function qualifyTestCase(description) {
   return { branch, job, context, testCase };
 }
 
-function decorate(test) {
+function decorateFailedTest(test) {
   const description = test.querySelector('header')?.querySelector('div:nth-child(1)');
   const { textContent } = description;
   if (description) {
     description.prepend(createPalette(
-      createButton('🥐', () => qualifyTestCase(textContent)),
-      createButton('🐛', () => qualifyTestCase(textContent)),
+      createButton('🥐', () => reportFlake(qualifyTestCase(textContent))),
+      createButton('🐛', () => reportBug(qualifyTestCase(textContent))),
     ));
   }
 }
@@ -52,7 +63,7 @@ function onMutate(events) {
   events.forEach(event => {
     event.addedNodes.forEach(node => {
       if (node.querySelectorAll)
-        node.querySelectorAll('[id^="failed-test-"]').forEach(decorate);
+        node.querySelectorAll('[id^="failed-test-"]').forEach(decorateFailedTest);
     })
   });
 }

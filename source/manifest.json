@@ -33,7 +33,7 @@
 				"https://app.circleci.com/*"
 			],
 			"js": [
-				"content-modify.js"
+				"content-circleci-tests.js"
 			]
 		}
 	]

@@ -1,13 +1,13 @@
 {
-	"name": "Quarantini for CircleCI",
-	"version": "0.0.0",
+	"name": "CircleCI Tweaks",
+	"version": "0.1.0",
 	"description": "One-button followup to broken builds and failing tests",
-	"homepage_url": "https://github.com/xeger/quarantini",
+	"homepage_url": "https://github.com/xeger/webext-circleci-tweaks",
 	"manifest_version": 2,
 	"minimum_chrome_version": "74",
 	"applications": {
 		"gecko": {
-			"id": "quarantini@xeger.github.io",
+			"id": "webext-circleci-tweaks@xeger.github.io",
 			"strict_min_version": "67.0"
 		}
 	},
@@ -33,7 +33,7 @@
 				"https://app.circleci.com/*"
 			],
 			"js": [
-				"content-circleci-tests.js"
+				"content-circleci-testing.js"
 			]
 		}
 	]

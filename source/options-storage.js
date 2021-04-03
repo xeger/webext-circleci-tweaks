@@ -2,8 +2,7 @@ import OptionsSync from 'webext-options-sync';
 
 export default new OptionsSync({
 	defaults: {
-		bugReportURL: '',
-		flakeReportURL: '',
+		quarantineURL: '',
 	},
 	migrations: [
 		OptionsSync.migrations.removeUnused

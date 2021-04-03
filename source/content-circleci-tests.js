@@ -1,10 +1,12 @@
-const extensionHost = typeof (chrome) === 'object' ? chrome : browser;
-const { runtime } = extensionHost;
+import browser from 'webextension-polyfill';
 
-function createButton(label, onClick) {
+function createButton(label, title, onClick) {
   const el = document.createElement('button');
   el.onclick = onClick;
+  el.style.margin = 0;
   el.style.display = 'inline';
+  el.style.padding = '0.1em';
+  el.title = title;
   el.textContent = label;
   return el;
 }
@@ -18,12 +20,16 @@ function createPalette(...controls) {
   return el;
 }
 
-function reportFlake(testMetadata) {
-  runtime.sendMessage({ feature: 'testing', action: 'reportFlake', subject: testMetadata });
-}
-
-function reportBug(testMetadata) {
-  runtime.sendMessage({ feature: 'testing', action: 'reportBug', subject: testMetadata });
+function interact(target, promise) {
+  target.disabled = true;
+  promise
+    .then(() => {
+      target.title = 'This test case is quarantined'
+    })
+    .catch(err => {
+      target.textContent = '⚠️';
+      target.title = err.message;
+    });
 }
 
 function qualifyBranch() {
@@ -48,18 +54,26 @@ function qualifyTestCase(description) {
   return { branch, job, context, testCase };
 }
 
+function quarantine(description, { target }) {
+  const object = qualifyTestCase(description);
+  interact(
+    target,
+    browser.runtime.sendMessage({ feature: 'testing', action: 'quarantine', object })
+  );
+}
+
 function decorateFailedTest(test) {
   const description = test.querySelector('header')?.querySelector('div:nth-child(1)');
-  const { textContent } = description;
   if (description) {
+    // important: must call this before we decorate the DOM, else textContent is polluted
+    const { textContent } = description;
     description.prepend(createPalette(
-      createButton('🥐', () => reportFlake(qualifyTestCase(textContent))),
-      createButton('🐛', () => reportBug(qualifyTestCase(textContent))),
+      createButton('🥐', 'Quarantine this test case', (event) => quarantine(textContent, event)),
     ));
   }
 }
 
-function onMutate(events) {
+function onMutateDOM(events) {
   events.forEach(event => {
     event.addedNodes.forEach(node => {
       if (node.querySelectorAll)
@@ -68,5 +82,5 @@ function onMutate(events) {
   });
 }
 
-const observer = new MutationObserver(onMutate);
+const observer = new MutationObserver(onMutateDOM);
 observer.observe(document, { childList: true, subtree: true });

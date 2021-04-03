@@ -1,16 +1,23 @@
+import browser from 'webextension-polyfill';
+
 // eslint-disable-next-line import/no-unassigned-import
 import optionsStorage from './options-storage.js';
 
-const extensionHost = typeof (chrome) === 'object' ? chrome : browser;
-const { runtime } = extensionHost;
+const jsonBody = { 'Content-Type': 'application/json' };
+const initPost = body => ({ method: 'post', headers: jsonBody, body: JSON.stringify(body) })
 
-const initPost = body => ({ method: 'post', headers: {}, body: JSON.stringify(body) })
+const quarantine = object =>
+  optionsStorage.getAll().then(({ quarantineURL }) =>
+    fetch(quarantineURL, initPost(object))
+  )
 
-runtime.onMessage.addListener(data => {
-  optionsStorage.getAll().then(({ flakeReportURL }) => {
-    console.log('FETCH:', flakeReportURL, data);
-    fetch(flakeReportURL, initPost(data)).then(() => {
-      console.log('Posted!');
-    })
-  })
+browser.runtime.onMessage.addListener(data => {
+  const { feature, action, object } = data;
+
+  switch ([feature, action].join('.')) {
+    case 'testing.quarantine':
+      return quarantine(object);
+    default:
+      console.error('Unknown message', data);
+  }
 });

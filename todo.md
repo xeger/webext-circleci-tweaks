@@ -1,0 +1,7 @@
+- Re-brand as "CircleCI Tweaks"
+- Make options page look better
+  - better layout
+  - validation messages
+  - inline help
+- Make quarantineURL more configurable (payload, maybe HTTP method)
+- Add more tweaks

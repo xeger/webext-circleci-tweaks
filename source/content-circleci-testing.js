@@ -3,9 +3,6 @@ import browser from 'webextension-polyfill';
 function createButton(label, title, onClick) {
   const el = document.createElement('button');
   el.onclick = onClick;
-  el.style.margin = 0;
-  el.style.display = 'inline';
-  el.style.padding = '0.1em';
   el.title = title;
   el.textContent = label;
   return el;
@@ -13,9 +10,7 @@ function createButton(label, title, onClick) {
 
 function createPalette(...controls) {
   const el = document.createElement('div');
-  el.style.display = 'inline';
-  el.style.marginLeft = '0.25em';
-  el.style.marginRight = '0.25em';
+  el.className = 'ccitweaks__palette';
   controls.forEach(c => el.appendChild(c))
   return el;
 }

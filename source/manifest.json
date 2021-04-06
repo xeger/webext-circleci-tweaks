@@ -32,6 +32,9 @@
 			"matches": [
 				"https://app.circleci.com/*"
 			],
+			"css": [
+				"content-circleci-testing.css"
+			],
 			"js": [
 				"content-circleci-testing.js"
 			]

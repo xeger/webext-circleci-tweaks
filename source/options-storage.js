@@ -13,6 +13,7 @@ const EXAMPLE_URL = `https://webhook.example.com/{vcs.org}/{vcs.repo}/{job.name}
 export default new OptionsSync({
 	defaults: {
 		quarantineBody: EXAMPLE_BODY,
+		quarantineMethod: 'post',
 		quarantineURL: EXAMPLE_URL,
 	},
 	migrations: [

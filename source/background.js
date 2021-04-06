@@ -24,11 +24,11 @@ function formatBody(template, object) {
 }
 
 const quarantine = object =>
-  optionsStorage.getAll().then(({ quarantineBody, quarantineURL }) => {
+  optionsStorage.getAll().then(({ quarantineBody, quarantineMethod, quarantineURL }) => {
     const url = formatString(quarantineURL, object)
     const bodyTemplate = JSON.parse(quarantineBody);
     const body = JSON.stringify(formatBody(bodyTemplate, object));
-    return fetch(url, { method: 'post', headers: JSON_CONTENT, body })
+    return fetch(url, { method: quarantineMethod, headers: JSON_CONTENT, body })
   })
 
 browser.runtime.onMessage.addListener(data => {

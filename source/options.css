@@ -3,25 +3,28 @@ html {
 	overflow-x: hidden; /* Required to hide horizontal scroll on Firefox */
 }
 
+.form-row {
+	margin: 1em 0;
+}
+
 /* For use with screen readers */
 .sr-only {
 	display: none;
 }
 
-/* Hide spinbox for number inputs */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-	-webkit-appearance: none;
-	margin: 0;
+input,textarea {
+	width: 70%;
 }
 
-input[type='number'] {
-	-moz-appearance: textfield;
+textarea {
+	min-height: 10em;
 }
 
-input[type='number'],
-input[type='text'] {
-	padding: 0.25rem 0.375rem;
+label {
+	display: inline-block;
+	width: 20%;
+	text-align: right;
+	vertical-align: top;
 }
 
 /* Firefox only */

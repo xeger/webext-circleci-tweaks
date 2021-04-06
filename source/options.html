@@ -6,14 +6,23 @@
 
 <form id="options-form" class="detail-view-container">
 	<h3>CircleCI Tweaks</h3>
-	<label>
-		<span>Quarantine URL</span>
-		<input name="quarantineURL" />
-	</label>
-	<label>
-		<span>Quarantine Body</span>
-		<textarea name="quarantineBody" />
-	</label>
+	<h4>Test Quarantining</h4>
+	<div class="browser-style form-row">
+		<label for="quarantineMethod">Method</label>
+		<select class="browser-style" id="quarantineMethod" name="quarantineMethod">
+			<option value="patch">PATCH</option>
+			<option value="post">POST</option>
+			<option value="put">PUT</option>
+		</select>
+	</div>
+	<div class="browser-style form-row">
+		<label for="quarantineURL">URL</label>
+		<input class="browser-style" id="quarantineURL" name="quarantineURL" />
+	</div>
+	<div class="browser-style" form-row>
+		<label for="quarantineBody">Body</label>
+		<textarea class="browser-style" id="quarantineBody" name="quarantineBody" />
+	</div>
 </form>
 
 <script src="options.js"></script>

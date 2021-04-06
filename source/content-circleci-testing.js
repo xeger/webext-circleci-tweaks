@@ -36,17 +36,31 @@ function qualifyBranch() {
 }
 
 function qualifyJob() {
-  return document.querySelector('[data-cy="job-name"]')?.textContent;
+  const { pathname } = window.location;
+  const id = pathname.match(/jobs\/\d+$/) ? pathname.slice(pathname.lastIndexOf('/') + 1) : undefined;
+  const name = document.querySelector('[data-cy="job-name"]')?.textContent;
+  return { id, name };
+}
+
+function qualifyVCS() {
+  const { pathname } = window.location;
+  if (pathname.startsWith('/pipelines/github')) {
+    const [org, repo] = pathname.slice(18).split('/');
+    const branch = qualifyBranch();
+    return { type: 'git', vendor: 'github', org, repo, branch };
+  } else {
+    return {};
+  }
 }
 
 function qualifyTestCase(description) {
   const job = qualifyJob();
-  const branch = qualifyBranch();
+  const vcs = qualifyVCS();
   const hyphen = description.lastIndexOf('-')
   const fullName = description.slice(0, hyphen - 1);
   const testCase = description.slice(hyphen + 2)
   const context = fullName.slice(0, fullName.length - testCase.length - 1);
-  return { branch, job, context, testCase };
+  return { context, testCase, job, vcs };
 }
 
 function quarantine(description, { target }) {

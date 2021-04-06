@@ -7,31 +7,13 @@
 <form id="options-form" class="detail-view-container">
 	<h3>CircleCI Tweaks</h3>
 	<label>
-		<span>Flake URL</span>
-		<input name="quarantineURL">
+		<span>Quarantine URL</span>
+		<input name="quarantineURL" />
 	</label>
-	<!--
-	<div class="color-picker">
-		<div class="color-inputs">
-			<label class="color-input">
-				<span>R</span>
-				<input type="range" min="0" max="255" name="colorRed">
-				<input type="number" name="colorRed" min="0" max="255">
-			</label>
-			<label class="color-input">
-				<span>G</span>
-				<input type="range" min="0" max="255" name="colorGreen">
-				<input type="number" name="colorGreen" min="0" max="255">
-			</label>
-			<label class="color-input">
-				<span>B</span>
-				<input type="range" min="0" max="255" name="colorBlue">
-				<input type="number" name="colorBlue" min="0" max="255">
-			</label>
-		</div>
-		<div class="color-output"></div>
-	</div>
--->
+	<label>
+		<span>Quarantine Body</span>
+		<textarea name="quarantineBody" />
+	</label>
 </form>
 
 <script src="options.js"></script>

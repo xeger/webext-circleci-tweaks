@@ -1,15 +1,35 @@
 import browser from 'webextension-polyfill';
+import formatString from 'string-format';
 
-// eslint-disable-next-line import/no-unassigned-import
 import optionsStorage from './options-storage.js';
 
-const jsonBody = { 'Content-Type': 'application/json' };
-const initPost = body => ({ method: 'post', headers: jsonBody, body: JSON.stringify(body) })
+const JSON_CONTENT = { 'Content-Type': 'application/json' };
+
+function formatBody(template, object) {
+  const formatted = {};
+  Object.entries(template).forEach(([key, value]) => {
+    switch (typeof value) {
+      case 'object':
+        formatted[key] = formatBody(value, object);
+        break;
+      case 'string':
+        formatted[key] = formatString(value, object);
+        break;
+      default:
+        formatted[key] = value;
+        break;
+    }
+  });
+  return formatted;
+}
 
 const quarantine = object =>
-  optionsStorage.getAll().then(({ quarantineURL }) =>
-    fetch(quarantineURL, initPost(object))
-  )
+  optionsStorage.getAll().then(({ quarantineBody, quarantineURL }) => {
+    const url = formatString(quarantineURL, object)
+    const bodyTemplate = JSON.parse(quarantineBody);
+    const body = JSON.stringify(formatBody(bodyTemplate, object));
+    return fetch(url, { method: 'post', headers: JSON_CONTENT, body })
+  })
 
 browser.runtime.onMessage.addListener(data => {
   const { feature, action, object } = data;

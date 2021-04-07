@@ -22,7 +22,6 @@
 		"page": "options.html"
 	},
 	"background": {
-		"persistent": false,
 		"scripts": [
 			"background.js"
 		]

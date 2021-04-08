@@ -1,28 +1,37 @@
-<!doctype html>
-<meta charset="utf-8">
-<title>Options</title>
-<link rel="stylesheet" href="chrome://global/skin/in-content/common.css">
-<link rel="stylesheet" href="options.css">
+<!DOCTYPE html>
 
-<form id="options-form" class="detail-view-container">
-	<h3>CircleCI Tweaks</h3>
-	<h4>Test Quarantining</h4>
-	<div class="browser-style form-row">
-		<label for="quarantineMethod">Method</label>
-		<select class="browser-style" id="quarantineMethod" name="quarantineMethod">
-			<option value="patch">PATCH</option>
-			<option value="post">POST</option>
-			<option value="put">PUT</option>
-		</select>
-	</div>
-	<div class="browser-style form-row">
-		<label for="quarantineURL">URL</label>
-		<input class="browser-style" id="quarantineURL" name="quarantineURL" />
-	</div>
-	<div class="browser-style" form-row>
-		<label for="quarantineBody">Body</label>
-		<textarea class="browser-style" id="quarantineBody" name="quarantineBody" />
-	</div>
-</form>
+<html>
 
-<script src="options.js"></script>
+<head>
+	<meta charset="utf-8">
+	<title>Options</title>
+	<!-- <link rel="stylesheet" href="chrome://global/skin/in-content/common.css"> -->
+	<link rel="stylesheet" href="options.css">
+</head>
+
+<body>
+	<form id="options-form" class="detail-view-container">
+		<h3>CircleCI Tweaks</h3>
+		<h4>Test Quarantining</h4>
+		<div class="browser-style form-row">
+			<label for="quarantineMethod">Method</label>
+			<select class="browser-style" id="quarantineMethod" name="quarantineMethod">
+				<option value="patch">PATCH</option>
+				<option value="post">POST</option>
+				<option value="put">PUT</option>
+			</select>
+		</div>
+		<div class="browser-style form-row">
+			<label for="quarantineURL">URL</label>
+			<input class="browser-style" id="quarantineURL" name="quarantineURL" />
+		</div>
+		<div class="browser-style" form-row>
+			<label for="quarantineBody">Body</label>
+			<textarea class="browser-style" id="quarantineBody" name="quarantineBody" />
+		</div>
+	</form>
+
+	<script src="options.js"></script>
+</body>
+
+</html>

@@ -18,6 +18,7 @@
 		"storage"
 	],
 	"options_ui": {
+		"browser_style": true,
 		"chrome_style": true,
 		"page": "options.html"
 	},

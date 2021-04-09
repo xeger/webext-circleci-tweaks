@@ -1,5 +1,7 @@
 # webext-circleci-tweaks
 
+Web extension for [Chrome](https://chrome.google.com/webstore/detail/circleci-tweaks/ckgcdofchjnpdocejdjmajhnpgnohklf?hl=en&authuser=1) and [Firefox](https://addons.mozilla.org/en-US/firefox/addon/circleci-tweaks/).
+
 ![Sample extension output](media/failing-tests.png)
 
 ## Features

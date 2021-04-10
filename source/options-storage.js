@@ -3,8 +3,8 @@ import OptionsSync from 'webext-options-sync';
 const EXAMPLE_BODY =
 	`
 {
-	"context": "{context}",
-	"testcase": "{testCase}"
+	"context": "{test.context}",
+	"testcase": "{test.testCase}"
 }
 `;
 

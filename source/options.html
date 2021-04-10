@@ -14,7 +14,11 @@
 		<h3>CircleCI Tweaks</h3>
 		<h4>Test Quarantining</h4>
 		<div class="browser-style form-row">
-			<label for="quarantineMethod">Method</label>
+			<label for="quarantineListURL">List URL</label>
+			<input class="browser-style" id="quarantineListURL" name="quarantineListURL" />
+		</div>
+		<div class="browser-style form-row">
+			<label for="quarantineMethod">Update Method</label>
 			<select class="browser-style" id="quarantineMethod" name="quarantineMethod">
 				<option value="patch">PATCH</option>
 				<option value="post">POST</option>
@@ -22,7 +26,7 @@
 			</select>
 		</div>
 		<div class="browser-style form-row">
-			<label for="quarantineURL">URL</label>
+			<label for="quarantineURL">Update URL</label>
 			<input class="browser-style" id="quarantineURL" name="quarantineURL" />
 		</div>
 		<div class="browser-style" form-row>

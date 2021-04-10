@@ -23,17 +23,31 @@ function formatBody(template, object) {
   return formatted;
 }
 
+const listQuarantined = parameters =>
+  optionsStorage.getAll().then(({ quarantineListURL }) => {
+    const url = formatString(quarantineListURL, parameters);
+    return fetch(url, { method: 'get' }).then(response => {
+      if (response.ok)
+        return response.json();
+      else
+        throw new Error('Failed to list quarantined tests');
+    });
+  });
+
 const quarantine = parameters =>
   optionsStorage.getAll().then(({ quarantineBody, quarantineMethod, quarantineURL }) => {
     const url = formatString(quarantineURL, parameters)
     const bodyTemplate = JSON.parse(quarantineBody);
     const body = JSON.stringify(formatBody(bodyTemplate, parameters));
     return fetch(url, { method: quarantineMethod, headers: JSON_CONTENT, body })
-  })
+  });
 
 async function performCommand({ command, parameters }) {
   try {
     switch (command) {
+      case 'testing.listQuarantined':
+        const result = await listQuarantined(parameters);
+        return { command, parameters, result };
       case 'testing.quarantine':
         await quarantine(parameters);
         return { command, parameters };

@@ -1,5 +1,10 @@
 import browser from 'webextension-polyfill';
 
+const JOB_PATHNAME = /\/jobs\/(\d+)/;
+
+let lastRefreshedPathname = '';
+let pendingTestsToDecorate = {};
+
 function createButton(label, title, onClick) {
   const el = document.createElement('button');
   el.onclick = onClick;
@@ -21,8 +26,12 @@ function decorateFailedTest(test) {
     // important: must call this before we decorate the DOM, else textContent is polluted
     const { textContent } = description;
     description.prepend(createPalette(
-      createButton('😷', 'Quarantine this test case', (event) => quarantine(textContent, event)),
+      createButton('😷', 'Quarantine this test case', event => quarantine(textContent, event)),
     ));
+    if (pendingTestsToDecorate[textContent]) {
+      decorateFailedTestWithQuarantineStatus(test);
+      delete pendingTestsToDecorate[textContent];
+    }
   }
 }
 
@@ -31,16 +40,21 @@ function decorateFailedTestWithQuarantineStatus(test, error) {
   if (button) {
     if (error) {
       button.disabled = false;
-      button.title = error.toString();
+      button.title = 'Error while quarantining: ' + error.toString();
       button.textContent = '⚠️';
     } else {
-      button.title = 'This test has been quarantined.'
+      button.disabled = true;
+      button.title = 'This test case is quarantined'
     }
   }
 }
 
+function describe({ context, testcase }) {
+  return !context ? `${testcase} - ${testcase}` : `${context} ${testcase} - ${testcase}`
+}
+
 function locateFailedTest({ context, testcase }) {
-  const description = !context ? `${testcase} - ${testcase}` : `${context} ${testcase} - ${testcase}`
+  const description = describe({ context, testcase });
   const nodes = document.body.querySelectorAll('[id^="failed-test-"]');
   for (let node of nodes) {
     if (node.textContent.indexOf(description) >= 0)
@@ -58,9 +72,11 @@ function qualifyBranch() {
 
 function qualifyJob() {
   const { pathname } = window.location;
-  const id = pathname.match(/jobs\/\d+$/) ? pathname.slice(pathname.lastIndexOf('/') + 1) : undefined;
+  const match = pathname.match(JOB_PATHNAME);
+  const id = match ? match[1] : undefined;
   const name = document.querySelector('[data-cy="job-name"]')?.textContent;
-  return { id, name };
+  if (id && name)
+    return { id, name };
 }
 
 function qualifyVCS() {
@@ -69,25 +85,29 @@ function qualifyVCS() {
     const [org, repo] = pathname.slice(18).split('/');
     const branch = qualifyBranch();
     return { type: 'git', vendor: 'github', org, repo, branch };
-  } else {
-    return {};
   }
 }
 
-function qualifyTestCase(description) {
-  const vcs = qualifyVCS();
-  const job = qualifyJob();
+function qualifyTest(description) {
   const hyphenAt = description.lastIndexOf('-')
+  if (hyphenAt < 0)
+    return;
   const fullName = description.slice(0, hyphenAt - 1);
   const testcase = description.slice(hyphenAt + 2)
   const context = fullName === testcase ? '' : fullName.slice(0, fullName.length - testcase.length - 1);
-  const test = { context, testcase };
+  return { context, testcase };
+}
+
+function qualify(description) {
+  const vcs = qualifyVCS();
+  const job = qualifyJob();
+  const test = qualifyTest(description);
   return { vcs, job, test };
 }
 
 function quarantine(description, { target }) {
   try {
-    const parameters = qualifyTestCase(description);
+    const parameters = qualify(description);
     target.disabled = true;
     port.postMessage({ command: 'testing.quarantine', parameters });
     // TODO: re-enable target? etc?
@@ -96,15 +116,26 @@ function quarantine(description, { target }) {
   }
 }
 
-function onMessage({ command, parameters, error }) {
-  console.debug('onMessage', { command, parameters, error });
+function onMessage({ command, parameters, result, error }) {
+  console.debug('onMessage', { command, parameters, result, error });
   try {
     switch (command) {
+      case 'testing.listQuarantined':
+        pendingTestsToDecorate = {};
+        result?.forEach(test => {
+          const node = locateFailedTest(test);
+          // This test may already be present in the DOM; if so, update it
+          if (node)
+            decorateFailedTestWithQuarantineStatus(node);
+          // Otherwise, cache it for future DOM updates
+          else
+            pendingTestsToDecorate[describe(test)] = true;
+        })
+        break;
       case 'testing.quarantine':
         {
           const node = locateFailedTest(parameters.test);
-          if (node)
-            decorateFailedTestWithQuarantineStatus(node, error);
+          if (node) decorateFailedTestWithQuarantineStatus(node, error);
         }
         break;
       default:
@@ -116,6 +147,17 @@ function onMessage({ command, parameters, error }) {
 }
 
 function onMutateDOM(events) {
+  const { location: { pathname } } = window;
+  const vcs = qualifyVCS();
+  const job = qualifyJob();
+  const hasContext = vcs && job;
+  const isTests = pathname.endsWith('/tests');
+  if (hasContext && isTests && pathname != lastRefreshedPathname) {
+    const parameters = { vcs, job };
+    port.postMessage({ command: 'testing.listQuarantined', parameters });
+    lastRefreshedPathname = pathname;
+  }
+
   events.forEach(event => {
     event.addedNodes.forEach(node => {
       if (node.querySelectorAll)

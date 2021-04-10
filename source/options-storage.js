@@ -4,7 +4,7 @@ const EXAMPLE_BODY =
 	`
 {
 	"context": "{test.context}",
-	"testcase": "{test.testCase}"
+	"testcase": "{test.testcase}"
 }
 `;
 

@@ -62,7 +62,10 @@ browser.runtime.onConnect.addListener(p => {
       .then(result => {
         console.debug('postMessage', result);
         try {
-          p.postMessage(result);
+          // TODO: why is this broken under Firefox?
+          //p.postMessage(result);
+          // HACK: use connectionless messaging for background -> content communication
+          browser.tabs.sendMessage(id, result);
         } catch (error) {
           console.error('postMessage', error);
         }

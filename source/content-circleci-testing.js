@@ -21,8 +21,30 @@ function decorateFailedTest(test) {
     // important: must call this before we decorate the DOM, else textContent is polluted
     const { textContent } = description;
     description.prepend(createPalette(
-      createButton('🥐', 'Quarantine this test case', (event) => quarantine(textContent, event)),
+      createButton('😷', 'Quarantine this test case', (event) => quarantine(textContent, event)),
     ));
+  }
+}
+
+function decorateFailedTestWithQuarantineStatus(test, error) {
+  const button = test.querySelector('header')?.querySelector('div:nth-child(1)')?.querySelector('button');
+  if (button) {
+    if (error) {
+      button.disabled = false;
+      button.title = error.toString();
+      button.textContent = '⚠️';
+    } else {
+      button.title = 'This test has been quarantined.'
+    }
+  }
+}
+
+function locateFailedTest({ context, testcase }) {
+  const description = !context ? `${testcase} - ${testcase}` : `${context} ${testcase} - ${testcase}`
+  const nodes = document.body.querySelectorAll('[id^="failed-test-"]');
+  for (let node of nodes) {
+    if (node.textContent.indexOf(description) >= 0)
+      return node;
   }
 }
 
@@ -53,13 +75,13 @@ function qualifyVCS() {
 }
 
 function qualifyTestCase(description) {
-  const job = qualifyJob();
   const vcs = qualifyVCS();
-  const hyphen = description.lastIndexOf('-')
-  const fullName = description.slice(0, hyphen - 1);
-  const testCase = description.slice(hyphen + 2)
-  const context = fullName.slice(0, fullName.length - testCase.length - 1);
-  const test = { context, testCase };
+  const job = qualifyJob();
+  const hyphenAt = description.lastIndexOf('-')
+  const fullName = description.slice(0, hyphenAt - 1);
+  const testcase = description.slice(hyphenAt + 2)
+  const context = fullName === testcase ? '' : fullName.slice(0, fullName.length - testcase.length - 1);
+  const test = { context, testcase };
   return { vcs, job, test };
 }
 
@@ -69,13 +91,28 @@ function quarantine(description, { target }) {
     target.disabled = true;
     port.postMessage({ command: 'testing.quarantine', parameters });
     // TODO: re-enable target? etc?
-  } catch (err) {
-    console.error('quarantine', err);
+  } catch (exception) {
+    console.error('quarantine', exception);
   }
 }
 
 function onMessage({ command, parameters, error }) {
-  log.debug('onMessage', command, parameters, error);
+  console.debug('onMessage', { command, parameters, error });
+  try {
+    switch (command) {
+      case 'testing.quarantine':
+        {
+          const node = locateFailedTest(parameters.test);
+          if (node)
+            decorateFailedTestWithQuarantineStatus(node, error);
+        }
+        break;
+      default:
+        throw new Error(`Unrecognized command`);
+    }
+  } catch (exception) {
+    console.error('onMessage', exception);
+  }
 }
 
 function onMutateDOM(events) {
@@ -89,7 +126,10 @@ function onMutateDOM(events) {
 
 const port = browser.runtime.connect();
 
+// TODO: why is this broken under Firefox?
 port.onMessage.addListener(onMessage);
+// HACK: use connectionless messaging for background -> content communication
+browser.runtime.onMessage.addListener(onMessage);
 
 const observer = new MutationObserver(onMutateDOM);
 observer.observe(document, { childList: true, subtree: true });

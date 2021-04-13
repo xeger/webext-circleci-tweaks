@@ -5,6 +5,9 @@ const JOB_PATHNAME = /\/jobs\/(\d+)/;
 let lastRefreshedPathname = '';
 let pendingTestsToDecorate = {};
 
+// Logs useful dev-mode info without polluting end-user console.
+const logDebug = (...rest) => (process.env.NODE_ENV === 'development') && console.debug(...rest);
+
 function createButton(label, title, onClick) {
   const el = document.createElement('button');
   el.onclick = onClick;
@@ -29,8 +32,11 @@ function decorateFailedTest(test) {
       createButton('😷', 'Quarantine this test case', event => quarantine(textContent, event)),
     ));
     if (pendingTestsToDecorate[textContent]) {
+      logDebug('decorateFailedTest HIT', { id: test.id })
       decorateFailedTestWithQuarantineStatus(test);
       delete pendingTestsToDecorate[textContent];
+    } else {
+      logDebug('decorateFailedTest MISS', { id: test.id })
     }
   }
 }
@@ -117,7 +123,7 @@ function quarantine(description, { target }) {
 }
 
 function onMessage({ command, parameters, result, error }) {
-  console.debug('onMessage', { command, parameters, result, error });
+  logDebug('onMessage', { command, parameters, result, error });
   try {
     switch (command) {
       case 'testing.listQuarantined':
@@ -125,11 +131,15 @@ function onMessage({ command, parameters, result, error }) {
         result?.forEach(test => {
           const node = locateFailedTest(test);
           // This test may already be present in the DOM; if so, update it
-          if (node)
+          if (node) {
+            logDebug('onMessage HIT', { id: test.id })
             decorateFailedTestWithQuarantineStatus(node);
+          }
           // Otherwise, cache it for future DOM updates
-          else
+          else {
+            logDebug('onMessage MISS')
             pendingTestsToDecorate[describe(test)] = true;
+          }
         })
         break;
       case 'testing.quarantine':
@@ -148,16 +158,20 @@ function onMessage({ command, parameters, result, error }) {
 
 function onMutateDOM(events) {
   const { location: { pathname } } = window;
+
+  // If we've navigated to a page with failed tests, ask server for quarantine list
   const vcs = qualifyVCS();
   const job = qualifyJob();
   const hasContext = vcs && job;
-  const isTests = pathname.endsWith('/tests');
-  if (hasContext && isTests && pathname != lastRefreshedPathname) {
+  const navigated = pathname != lastRefreshedPathname;
+  if (hasContext && navigated) {
     const parameters = { vcs, job };
+    logDebug('onMutateDOM', 'freshen quarantine list', parameters);
     port.postMessage({ command: 'testing.listQuarantined', parameters });
     lastRefreshedPathname = pathname;
   }
 
+  // Augment tests with UI
   events.forEach(event => {
     event.addedNodes.forEach(node => {
       if (node.querySelectorAll)

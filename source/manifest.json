@@ -1,6 +1,6 @@
 {
 	"name": "CircleCI Tweaks",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"description": "One-button followup to broken builds and failing tests",
 	"homepage_url": "https://github.com/xeger/webext-circleci-tweaks",
 	"manifest_version": 2,

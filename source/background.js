@@ -37,8 +37,7 @@ const listQuarantined = parameters =>
 const quarantine = parameters =>
   optionsStorage.getAll().then(({ quarantineBody, quarantineMethod, quarantineURL }) => {
     const url = formatString(quarantineURL, parameters)
-    const bodyTemplate = JSON.parse(quarantineBody);
-    const body = JSON.stringify(formatBody(bodyTemplate, parameters));
+    const body = formatString(quarantineBody, parameters);
     return fetch(url, { method: quarantineMethod, headers: JSON_CONTENT, body })
   });
 

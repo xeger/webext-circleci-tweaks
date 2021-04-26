@@ -3,7 +3,8 @@ import OptionsSync from 'webext-options-sync';
 const EXAMPLE_BODY =
 	`{
 	"context": "{test.context}",
-	"testcase": "{test.testcase}"
+	"testcase": "{test.testcase}", 
+	"ttl_hours": {ttl_hours}
 }`;
 
 const EXAMPLE_QUARANTINE_LIST_URL = `https://webhook.example.com/{vcs.org}/{vcs.repo}/{job.name}/quarantined_tests`;

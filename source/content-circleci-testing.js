@@ -113,7 +113,7 @@ function qualify(description) {
 
 function quarantine(description, { target }) {
   try {
-    const ttl = prompt("For How Long? (In Hours)", "24")
+    const ttl = prompt("For How Long? (In Hours)", "48")
     const parameters = qualify(description);
     parameters.ttl_hours = Number(ttl);
     target.disabled = true;

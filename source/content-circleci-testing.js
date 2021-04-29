@@ -44,14 +44,18 @@ function decorateFailedTest(test) {
 function decorateFailedTestWithQuarantineStatus(test, error) {
   const button = test.querySelector('header')?.querySelector('div:nth-child(1)')?.querySelector('button');
   if (button) {
-    if (error) {
-      button.disabled = false;
-      button.title = 'Error while quarantining: ' + error.toString();
-      button.textContent = '⚠️';
-    } else {
-      button.disabled = true;
-      button.title = 'This test case is quarantined'
-    }
+    decorateButtonWithQuarantineStatus(button, error);
+  }
+}
+
+function decorateButtonWithQuarantineStatus(button, error) {
+  if (error) {
+    button.disabled = false;
+    button.title = 'Error while quarantining: ' + error.toString();
+    button.textContent = '⚠️';
+  } else {
+    button.disabled = true;
+    button.title = 'This test case is quarantined'
   }
 }
 
@@ -118,9 +122,9 @@ function quarantine(description, { target }) {
     parameters.ttl_hours = Number(ttl) * 24;
     target.disabled = true;
     port.postMessage({ command: 'testing.quarantine', parameters });
-    // TODO: re-enable target? etc?
-  } catch (exception) {
-    console.error('quarantine', exception);
+  } catch (error) {
+    decorateButtonWithQuarantineStatus(target, error)
+    console.error('quarantine', error);
   }
 }
 

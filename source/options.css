@@ -12,7 +12,8 @@ html {
 	display: none;
 }
 
-input,textarea {
+input,
+textarea {
 	width: 70%;
 }
 

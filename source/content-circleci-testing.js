@@ -113,9 +113,9 @@ function qualify(description) {
 
 function quarantine(description, { target }) {
   try {
-    const ttl = prompt("For How Long? (In Hours)", "48")
+    const ttl = prompt("For How Long? (In Days)", "2.0");
     const parameters = qualify(description);
-    parameters.ttl_hours = Number(ttl);
+    parameters.ttl_hours = Number(ttl) * 24;
     target.disabled = true;
     port.postMessage({ command: 'testing.quarantine', parameters });
     // TODO: re-enable target? etc?

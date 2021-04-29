@@ -54,8 +54,8 @@ async function performCommand({ command, parameters }) {
         throw new Error(`Unrecognized command`);
     }
   } catch (error) {
-    console.error('performCommand', error);
-    return { command, parameters, error };
+    console.error('performCommand', error.toString());
+    return { command, parameters, error: error.toString() };
   }
 }
 

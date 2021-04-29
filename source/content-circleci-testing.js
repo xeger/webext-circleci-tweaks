@@ -116,6 +116,8 @@ function qualify(description) {
 }
 
 function quarantine(description, { target }) {
+  // TODO: stop using window.prompt to avoid Chromium policy violations
+  // @see https://developers.google.com/web/updates/2017/03/dialogs-policy
   try {
     const ttl = prompt("For How Long? (In Days)", "2.0");
     const parameters = qualify(description);

@@ -19,11 +19,17 @@
 			"browser"
 		],
 		"rules": {
+			"camelcase": [
+				"off"
+			],
 			"no-unused-vars": [
 				"error",
 				{
 					"varsIgnorePattern": "browser"
 				}
+			],
+			"no-warning-comments": [
+				"off"
 			]
 		}
 	},

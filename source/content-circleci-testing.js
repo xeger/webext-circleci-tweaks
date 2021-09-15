@@ -9,8 +9,11 @@ let pendingTestsToDecorate = {};
 const logDebug = (...rest) => (process.env.NODE_ENV === 'development') && console.debug(...rest);
 
 function createButton(label, title, onClick) {
-	const element = document.createElement('button');
-	element.addEventListener('click', onClick);
+	const element = document.createElement('button')
+	element.addEventListener('click', event => {
+		 event.preventDefault();
+			onClick(event);
+	});
 	element.title = title;
 	element.textContent = label;
 	return element;
@@ -24,7 +27,7 @@ function createPalette(...controls) {
 }
 
 function decorateFailedTest(test) {
-	const description = test.querySelector('header')?.querySelector('div:nth-child(1)');
+	const description = test.querySelector('header')?.querySelector('h4');
 	if (description) {
 		// Important: must call this before we decorate the DOM, else textContent is polluted
 		const {textContent} = description;
@@ -83,6 +86,7 @@ function qualifyBranch() {
 
 function qualifyJob() {
 	const {pathname} = window.location;
+	logDebug(window.pathname)
 	const match = pathname.match(JOB_PATHNAME);
 	const id = match ? match[1] : undefined;
 	const name = document.querySelector('[data-cy="job-name"]')?.textContent;

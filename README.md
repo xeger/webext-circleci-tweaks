@@ -14,6 +14,32 @@ TODO
 
 ## Contributor's Guide
 
+### Publishing By Hand
+
+Edit `source/manifest.json` and bump the version. Commit this and add corresponding git tag; `git push --tags`.
+
+Build the distribution files.
+
+```
+npm run build
+```
+
+Create the source zip to submit for Firefox security review.
+
+```
+zip ./webext-circleci-tweaks-source.zip *.md *.json source/*
+```
+
+Create the distributable zip to upload to the Chrome + Firefox developer dashboards.
+
+```
+cd distribution
+zip ../webext-circleci-tweaks.zip *
+
+```
+
+Upload all the zips!
+
 ### Publishing
 
 It's possible to automatically publish to both the Chrome Web Store and Mozilla Addons at once by adding these secrets on GitHub Actions:

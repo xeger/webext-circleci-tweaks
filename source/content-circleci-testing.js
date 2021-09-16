@@ -10,7 +10,10 @@ const logDebug = (...rest) => (process.env.NODE_ENV === 'development') && consol
 
 function createButton(label, title, onClick) {
 	const element = document.createElement('button');
-	element.addEventListener('click', onClick);
+	element.addEventListener('click', event => {
+		event.preventDefault();
+		onClick(event);
+	});
 	element.title = title;
 	element.textContent = label;
 	return element;
@@ -24,7 +27,7 @@ function createPalette(...controls) {
 }
 
 function decorateFailedTest(test) {
-	const description = test.querySelector('header')?.querySelector('div:nth-child(1)');
+	const description = test.querySelector('header')?.querySelector('h4');
 	if (description) {
 		// Important: must call this before we decorate the DOM, else textContent is polluted
 		const {textContent} = description;

@@ -14,3 +14,10 @@ Milestone goal: make the extension useful to others
 - Make quarantineURL more configurable (payload, maybe HTTP method)
 - Add more tweaks
   - Marquee links from build output
+
+v0.3.1
+------
+Maintenance release to adapt to changes in the CircleCI UI.
+
+- Parse test descriptions using a more accurate selector
+- Prevent onClick bubbling which triggered CCI UI behaviors

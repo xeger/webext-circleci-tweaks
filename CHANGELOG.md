@@ -17,7 +17,13 @@ Milestone goal: make the extension useful to others
 
 v0.3.1
 ------
+
+Accidental release (is identical to v0.3.0).
+
+v0.3.2
+------
 Maintenance release to adapt to changes in the CircleCI UI.
 
 - Parse test descriptions using a more accurate selector
 - Prevent onClick bubbling which triggered CCI UI behaviors
+
